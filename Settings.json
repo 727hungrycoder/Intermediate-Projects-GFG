@@ -1,0 +1,23 @@
+[
+    {
+        "notebook.editorOptionsCustomizations": {},
+        "workbench.settings.useSplitJSON": false,
+        "python.linting.pylintEnabled": true,
+        "python.formatting.provider": "autopep8",
+        "python.linting.flake8Enabled": true,
+        "editor.quickSuggestions": {
+            "other": true,
+            "comments": false,
+            "strings": false
+        },
+        "editor.suggest.snippetsPreventQuickSuggestions": false,
+        "editor.snippetSuggestions": "top",
+        "editor.wordBasedSuggestions": true,
+        "editor.tabSize": 4,
+        "python.analysis.completeFunctionParens": true,
+        "python.autoComplete.extraPaths": [],
+        "python.autoComplete.addBrackets": true,
+        "python.jediEnabled": true,
+        "python.jediPath": "C:\\Users\\Raj\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\jedi"
+    }
+]
