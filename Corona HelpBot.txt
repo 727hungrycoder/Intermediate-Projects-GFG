@@ -1,0 +1,371 @@
+This is a chatbot that will give answers to most of your corona-related questions/FAQ. The chatbot will give you answers from the data given by WHO(https://www.who.int/). This will help those who need information or help to know more about this virus.
+
+It uses a neural network with two hidden layers(enough for these QnA) that predicts which pattern matches the user’s question and sends it towards that node. More patterns can be added to the user’s questions to train it for more improved results and add more info about coronavirus in the JSON file. The more you train this chatbot the more it gets precise. The advantage of using deep learning is that you don’t have to ask the same question as written in the JSON file cause stemmed words from the pattern are matched with the user question
+
+
+
+Prerequisites: 
+
+Python 3
+NumPy
+nltk
+TensorFlow v.1.15 (no GPU required)
+tflearn
+
+
+
+Training Data: 
+To feed the data to the chatbot I have used JSON with possible question patterns and our desired answers. 
+The JSON file used for the project is WHO 
+For this project, I have named my JSON file WHO.json 
+The JSON file tag is the category in which all those responses fall. 
+patterns are used for listing all possible question patterns. 
+responses contain all the responses with respect to the patterned questions 
+
+
+This code appears to be setting up a natural language processing (NLP) model using the nltk, tflearn, and tensorflow libraries to perform some kind of text-based task. Let's break down each library and its likely role in the code:
+
+import nltk: The Natural Language Toolkit (NLTK) is a powerful library for working with human language data. It provides easy-to-use interfaces to over 50 corpora and lexical resources, such as WordNet. In the context of the code, NLTK might be used for tasks like tokenization, stemming, or other natural language processing operations.
+
+import numpy: NumPy is a library for numerical operations in Python. It provides support for large, multi-dimensional arrays and matrices, along with mathematical functions to operate on these elements. In this context, it might be used for handling numerical data, particularly if the model involves any mathematical operations.
+
+import tflearn and import tensorflow: TensorFlow is an open-source machine learning library developed by Google, and tflearn is a high-level neural network library built on top of TensorFlow. These libraries are likely used for building and training neural networks for natural language processing tasks. TensorFlow provides the underlying computation graph and optimization routines, while tflearn simplifies the process of building and training neural networks.
+
+import pickle: Pickle is a module used for serializing and deserializing Python objects. It is often used to save and load machine learning models or other complex data structures. In this context, it may be used to save the trained model or other important data.
+
+import random: The random module provides functions for generating pseudo-random numbers. In the context of machine learning, it might be used for tasks like shuffling the training data to introduce randomness during training.
+
+import json: The json module provides methods for working with JSON (JavaScript Object Notation) data, which is a lightweight data interchange format. In this context, it might be used for loading JSON-encoded data, such as configuration parameters or training data.
+
+Without seeing the entire code, it's challenging to provide a more specific explanation. The code likely involves training a machine learning model for some NLP task using TensorFlow, with additional support from tflearn, and includes data preprocessing with nltk and handling data using numpy. The pickle, random, and json modules suggest that the code involves saving and loading models, introducing randomness, and working with JSON-encoded data, respectively.
+
+
+
+
+
+he nltk.download('punkt') command is used to download the "punkt" dataset for the NLTK library. The "punkt" dataset includes the pre-trained Punkt tokenizer models for tokenization tasks.
+
+Tokenization is the process of breaking down a text into individual units, often words or sentences. The Punkt tokenizer, provided by NLTK, is a pre-trained unsupervised machine learning model for tokenizing text into sentences or words. By downloading the "punkt" dataset, you ensure that the necessary tokenizer models are available for your NLTK installation.
+
+Here's a brief breakdown:
+
+NLTK: The Natural Language Toolkit, a powerful library for working with human language data in Python.
+
+Tokenizer: A tokenizer is a tool that breaks down a text into smaller units, such as words or sentences.
+
+Punkt Tokenizer: A specific tokenizer implementation provided by NLTK, which is trained to tokenize text into sentences or words based on patterns in the data.
+
+When you run nltk.download('punkt'), NLTK will download and install the "punkt" dataset, making the Punkt tokenizer models available for use in your code. This is often one of the initial steps when working with NLTK for natural language processing tasks.
+
+User
+from nltk.stem.lancaster import LancasterStemmer
+stemmer = LancasterStemmer()
+ 
+ #loading the json data
+with open("WHO.json") as file:                  
+    data = json.load(file)
+     
+ChatGPT
+The provided code segment is loading data from a JSON file named "WHO.json" using the json.load() function. It seems like the code is part of a Natural Language Processing (NLP) or text processing task, where the content of the JSON file likely contains information related to the World Health Organization (WHO).
+
+Here's a breakdown of the code:
+
+Importing LancasterStemmer from NLTK:
+
+python
+Copy code
+from nltk.stem.lancaster import LancasterStemmer
+stemmer = LancasterStemmer()
+This code imports the LancasterStemmer class from NLTK, which is used for stemming words. Stemming is the process of reducing words to their root or base form.
+
+Loading JSON Data:
+
+python
+Copy code
+with open("WHO.json") as file:
+    data = json.load(file)
+This code opens the file "WHO.json" and uses json.load() to parse the JSON data from the file. The resulting data is stored in the variable data. The assumption here is that the JSON file contains information related to the World Health Organization.
+
+Please note that the code assumes the existence of a file named "WHO.json" in the same directory as the script. If the file is not present or if its structure is different, the code might encounter errors during execution. Additionally, the actual processing of the loaded data is not shown in the provided code snippet.
+
+
+
+
+
+The provided code segment is loading data from a JSON file named "WHO.json" using the json.load() function. It seems like the code is part of a Natural Language Processing (NLP) or text processing task, where the content of the JSON file likely contains information related to the World Health Organization (WHO).
+
+Here's a breakdown of the code:
+
+Importing LancasterStemmer from NLTK:
+
+python
+Copy code
+from nltk.stem.lancaster import LancasterStemmer
+stemmer = LancasterStemmer()
+This code imports the LancasterStemmer class from NLTK, which is used for stemming words. Stemming is the process of reducing words to their root or base form.
+
+Loading JSON Data:
+
+python
+Copy code
+with open("WHO.json") as file:
+    data = json.load(file)
+This code opens the file "WHO.json" and uses json.load() to parse the JSON data from the file. The resulting data is stored in the variable data. The assumption here is that the JSON file contains information related to the World Health Organization.
+
+Please note that the code assumes the existence of a file named "WHO.json" in the same directory as the script. If the file is not present or if its structure is different, the code might encounter errors during execution. Additionally, the actual processing of the loaded data is not shown in the provided code snippet.
+
+
+
+try:
+    with open("data.pickle", "rb") as f:
+        words, l, training, output = pickle.load(f)
+except:
+     
+    #  Extracting Data
+    words = []
+    l = []
+    docs_x = []
+    docs_y = []
+     Certainly! Let's break down the code block step by step:
+
+try: and except::
+
+The code is enclosed in a try block, which means it will attempt to execute the code within it.
+If there is an error during the execution (for example, if the file "data.pickle" does not exist or is corrupted), it will catch the exception, and the code inside the except block will be executed.
+Opening the Pickle File:
+
+python
+Copy code
+with open("data.pickle", "rb") as f:
+The open() function is used to open the file named "data.pickle" in binary read mode ("rb").
+The with statement is used for automatic resource management. It ensures that the file is properly closed after reading its content.
+Loading Pickle Data:
+
+python
+Copy code
+words, l, training, output = pickle.load(f)
+The pickle.load() method is used to deserialize the contents of the pickle file and load them into the variables words, l, training, and output.
+These variables likely contain data related to natural language processing (NLP) and machine learning, given the context of the libraries imported (nltk, tflearn, tensorflow, pickle, etc.).
+except Block:
+
+python
+Copy code
+except:
+If there is an exception during the try block (e.g., the file doesn't exist or is corrupted), the code inside the except block will be executed.
+Data Extraction (inside except block):
+
+python
+Copy code
+words = []
+l = []
+docs_x = []
+docs_y = []
+If an exception occurs, or if the file doesn't exist, new empty lists (words, l, docs_x, docs_y) are created. These lists are likely intended to store data related to NLP or machine learning.
+In summary, this code block attempts to load data from a pickle file. If successful, it extracts the data into specific variables. If unsuccessful (due to an exception), it initializes empty lists. The purpose and content of these lists are context-dependent and may be related to a natural language processing or machine learning project.
+
+User
+data.pickle
+ChatGPT
+The term "data.pickle" likely refers to a file with the extension ".pickle" that contains serialized data. The use of the term in the code suggests that this file is used to store and retrieve specific data.
+
+In Python, the pickle module is used for serializing and deserializing objects. Serialization is the process of converting a Python object into a byte stream, and deserialization is the reverse process—converting a byte stream back into a Python object. Pickle files have the advantage of preserving the structure and type of the objects being stored.
+
+In the given code, the with open("data.pickle", "rb") as f: line is attempting to open a file named "data.pickle" in binary read mode ("rb"). If the file exists, it is expected to contain serialized data, and the pickle.load(f) method is used to load that data into specific variables.
+
+The specific content of "data.pickle" would depend on the context of the code and the purpose for which it was created. It might store machine learning models, processed natural language data, or any other serialized Python objects relevant to the project.
+
+
+
+for i in data["intents"]:   
+        for p in i["patterns"]:
+            wrds = nltk.word_tokenize(p)
+            words.extend(wrds)
+            docs_x.append(wrds)
+            docs_y.append(i["tag"])
+ChatGPT
+In the provided code snippet, there is a loop that iterates over the "intents" in the data loaded from the "WHO.json" file. For each intent, it iterates over the "patterns" associated with that intent. The code tokenizes each pattern into words using the nltk.word_tokenize function, and the resulting words are added to the words list. Additionally, the tokenized words are appended to the docs_x list, and the corresponding intent tag is appended to the docs_y list.
+
+Here's a breakdown of the code:
+
+python
+Copy code
+for i in data["intents"]:
+    for p in i["patterns"]:
+        # Tokenize the pattern into words
+        wrds = nltk.word_tokenize(p)
+
+        # Extend the 'words' list with the tokenized words
+        words.extend(wrds)
+
+        # Append the tokenized words to 'docs_x'
+        docs_x.append(wrds)
+
+        # Append the intent tag to 'docs_y'
+        docs_y.append(i["tag"])
+After this loop, the words, docs_x, and docs_y lists will contain information extracted from the patterns in the "intents" of the loaded JSON data. These lists are likely used for further processing, such as training a natural language processing (NLP) or machine learning model. The specific details would depend on the broader context of the code and its intended use.
+
+User
+words = [stemmer.stem(w.lower()) for w in words if w != "?"]         
+    words = sorted(list(set(words)))
+    l = sorted(l) 
+ChatGPT
+In this part of the code, the words list is processed for stemming and further preparation. Here's a breakdown of each step:
+
+Stemming:
+
+python
+Copy code
+words = [stemmer.stem(w.lower()) for w in words if w != "?"]
+stemmer.stem(w.lower()): For each word w in the words list, the Lancaster Stemmer (stemmer) is applied to obtain the stem of the word. Stemming reduces words to their base or root form, helping in simplifying the vocabulary.
+w.lower(): The word is converted to lowercase before stemming to ensure uniformity.
+Remove Question Marks:
+
+python
+Copy code
+words = [stemmer.stem(w.lower()) for w in words if w != "?"]
+if w != "?": Words that are equal to "?" (question marks) are filtered out. This step likely aims to remove question marks from the vocabulary.
+Remove Duplicates and Sort:
+
+python
+Copy code
+words = sorted(list(set(words)))
+list(set(words)): Converts the list of stemmed words to a set to remove duplicates.
+sorted(...): Sorts the unique words alphabetically.
+Sort Intent Tags:
+
+python
+Copy code
+l = sorted(l)
+The list l, which contains intent tags (docs_y), is sorted alphabetically.
+After this processing, the words list contains unique stemmed words without question marks, sorted alphabetically. The l list is sorted, and both are likely used in subsequent steps of the code, such as preparing data for training a model.
+
+raining = []
+    output = []
+    out_empty = [0 for _ in range(len(l))]
+    for x, doc in enumerate(docs_x):
+        bag = []
+  
+        wrds = [stemmer.stem(w) for w in doc]
+  
+        for w in words:
+            if w in wrds:
+                bag.append(1)
+            else:
+                bag.append(0)
+        output_row = out_empty[:]
+        output_row[l.index(docs_y[x])] = 1
+  
+        training.append(bag)
+        output.append(output_row)
+ChatGPT
+In this section of the code, the training data (training) and corresponding output labels (output) are prepared. The process involves creating a bag of words representation for each training example, where each word in the vocabulary (words) is represented by a binary value (1 if present, 0 if absent). Here's a step-by-step explanation:
+
+Initialize Empty Output Row:
+
+python
+Copy code
+out_empty = [0 for _ in range(len(l))]
+out_empty is a list of zeros with a length equal to the number of unique intent tags (l). This list serves as a template for creating output rows.
+Iterate Through Training Examples:
+
+python
+Copy code
+for x, doc in enumerate(docs_x):
+Iterate through each training example (doc) along with its index (x).
+Stem Words in the Document:
+
+python
+Copy code
+wrds = [stemmer.stem(w) for w in doc]
+Apply stemming to each word in the current document (doc).
+Create Bag of Words Representation:
+
+python
+Copy code
+for w in words:
+    if w in wrds:
+        bag.append(1)
+    else:
+        bag.append(0)
+For each word in the overall vocabulary (words), check if it is present in the stemmed words of the current document (wrds). If present, append 1 to the bag; otherwise, append 0. This process creates a binary representation indicating the presence or absence of each word in the document.
+Create Output Row:
+
+python
+Copy code
+output_row = out_empty[:]
+output_row[l.index(docs_y[x])] = 1
+Create an output row by copying the template (out_empty). Set the value at the index corresponding to the intent tag of the current document (docs_y[x]) to 1.
+Append to Training Data and Output:
+
+python
+Copy code
+training.append(bag)
+output.append(output_row)
+Append the bag of words representation (bag) to the training data (training).
+Append the output row to the output labels (output).
+After this process, training contains the bag of words representations for all training examples, and output contains corresponding one-hot encoded intent labels. These are typically used to train a machine learning model for intent classification.
+
+
+This section of the code completes the training of the neural network, saves the model, and sets up a simple chat interface for interacting with the trained model. Let's break it down:
+
+python
+Copy code
+model = tflearn.DNN(net)
+Create an instance of the TFLearn DNN (Deep Neural Network) class, using the defined network architecture net.
+python
+Copy code
+try:                               
+    model.load("model.tflearn")
+except:
+    # If a pre-trained model is not found, train the model
+    # Training & Saving the Model
+    model.fit(training, output, n_epoch=1000, batch_size=8, show_metric=True)        
+    model.save("model.tflearn")
+Attempt to load a pre-trained model from the file "model.tflearn." If the file is not found (or if loading fails), train the model using the provided training data (training and output). The training process involves iterating over the dataset (n_epoch times) with a specified batch size. The show_metric=True parameter displays training metrics such as accuracy during training. After training, save the model to the file "model.tflearn."
+python
+Copy code
+def bag_of_words(s, words):                                
+    # Function to convert input text into a bag-of-words representation
+    bag = [0 for _ in range(len(words))]
+  
+    s_words = nltk.word_tokenize(s)
+    s_words = [stemmer.stem(word.lower()) for word in s_words]
+  
+    for se in s_words:
+        for i, w in enumerate(words):
+            if w == se:
+                bag[i] = 1
+  
+    return numpy.array(bag)
+Define a function bag_of_words that converts an input sentence into a bag-of-words representation. It returns a binary array where each element corresponds to the presence or absence of a word in the input sentence.
+python
+Copy code
+def chat():
+    print("""Start talking with the bot and ask your
+    queries about Corona-virus (type quit to stop)!""")
+     
+    while True:
+        inp = input("You: ")
+        if inp.lower() == "quit":
+            break
+  
+        results = model.predict([bag_of_words(inp, words)])[0]
+        results_index = numpy.argmax(results)
+         
+        tag = l[results_index]
+        if results[results_index] > 0.7:
+            for tg in data["intents"]:
+                if tg['tag'] == tag:
+                    responses = tg['responses']
+  
+            print(random.choice(responses))
+        else:
+            print("I am sorry but I can't understand")
+Set up a simple chat interface in the chat function. The user can input sentences, and the model will predict the intent based on the bag-of-words representation. If the predicted intent's confidence (results[results_index]) is above a threshold (0.7 in this case), the bot will randomly select and print a response from the corresponding intent. If the confidence is below the threshold, a default "I am sorry but I can't understand" message is printed.
+This code completes the chat interface, allowing users to interact with the trained model and receive responses based on the predicted intent.
+
+
+
+
+
+

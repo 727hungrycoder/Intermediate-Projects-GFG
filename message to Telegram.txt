@@ -1,0 +1,209 @@
+end message to Telegram user using Python
+Read
+Courses
+Practice
+Have you ever wondered how people do automation on Telegram? You may know that Telegram has a big user base and so it is one of the preferred social media to read people. What good thing about Telegram is that it provides a bunch of API’s methods, unlike Whatsapp which restricts such things. So in this post, we will be sharing how to send messages to a Telegram user using Python.
+
+Getting Started
+First, create a bot using Telegram BotFather. To create a BotFather follow the below steps as follows:  
+
+Open the telegram app and search for @BotFather.
+Click on the start button or send “/start”.
+Then send “/newbot” message to set up a name and a username.
+After setting name and username BotFather will give you an API token which is your bot token.\
+Then create an app on the telegram. Follow the below steps: 
+
+Log into the telegram core: https://my.telegram.org
+Go to ‘API development tools’ and fill out the form.
+You will get the api_id and api_hash parameters required for user authorization. 
+
+telebot: To install this module type the below command in the terminal.
+pip install telebot
+telethon: To install this module type the below command in the terminal. 
+pip install telethon
+Below is the implementation. 
+
+# importing all required libraries
+import telebot
+from telethon.sync import TelegramClient
+from telethon.tl.types import InputPeerUser, InputPeerChannel
+from telethon import TelegramClient, sync, events
+ 
+  
+# get your api_id, api_hash, token
+# from telegram as described above
+api_id = 'API_id'
+api_hash = 'API_hash'
+token = 'bot token'
+message = "Working..."
+ 
+# your phone number
+phone = 'YOUR_PHONE_NUMBER_WTH_COUNTRY_CODE'
+  
+# creating a telegram session and assigning
+# it to a variable client
+client = TelegramClient('session', api_id, api_hash)
+  
+# connecting and building the session
+client.connect()
+ 
+# in case of script ran first time it will
+# ask either to input token or otp sent to
+# number or sent or your telegram id 
+if not client.is_user_authorized():
+  
+    client.send_code_request(phone)
+     
+    # signing in the client
+    client.sign_in(phone, input('Enter the code: '))
+  
+  
+try:
+    # receiver user_id and access_hash, use
+    # my user_id and access_hash for reference
+    receiver = InputPeerUser('user_id', 'user_hash')
+ 
+    # sending message using telegram client
+    client.send_message(receiver, message, parse_mode='html')
+except Exception as e:
+     
+    # there may be many error coming in while like peer
+    # error, wrong access_hash, flood_error, etc
+    print(e);
+ 
+# disconnecting the telegram session 
+client.disconnect()
+Code Explanation: 
+
+The code starts by importing all the required libraries.
+The first library is telebot which is used to interact with Telegram.
+Next, we import the sync module which helps us to keep our code organized and easy to read.
+We also import the events module so that we can handle various telegram related events.
+Next, we get our API_id, API_hash, and token from Telegram as described earlier in this tutorial.
+Then, we create a variable called message for holding our message.
+We then connect to Telegram and assign the session to a variable called client .
+Next, we sign in the client using its phone number and user ID ( input(‘Enter the code: ‘)) .
+Finally, we try sending a message using the telegram client but there may be many errors coming in while trying so let’s print them out for further analysis.
+Once everything is okay, we disconnect the session by calling client.disconnect() .
+The code will first import all the required libraries and set up a TelegramClient instance.
+Next, it will get your API_id, API_hash and token from Telegram.
+Finally, it will create a message variable and assign it to the client object. 
+Have you ever wondered how people do automation on Telegram? You may know that Telegram has a big user base and so it is one of the preferred social media to read people. What good thing about Telegram is that it provides a bunch of API’s methods, unlike Whatsapp which restricts such things. So in this post, we will be sharing how to send messages to a Telegram user using Python.
+
+Getting Started
+First, create a bot using Telegram BotFather. To create a BotFather follow the below steps as follows:  
+
+Open the telegram app and search for @BotFather.
+Click on the start button or send “/start”.
+Then send “/newbot” message to set up a name and a username.
+After setting name and username BotFather will give you an API token which is your bot token.\
+Then create an app on the telegram. Follow the below steps: 
+
+Log into the telegram core: https://my.telegram.org
+Go to ‘API development tools’ and fill out the form.
+You will get the api_id and api_hash parameters required for user authorization. 
+Modules needed
+You need several Python library imports for the script functioning.  
+
+
+telebot: To install this module type the below command in the terminal.
+pip install telebot
+telethon: To install this module type the below command in the terminal. 
+pip install telethon
+Below is the implementation. 
+
+his code is a Python script that uses the Telethon library to send a message to a specified user on Telegram using the Telegram API. Here's a breakdown of what the code does:
+
+Importing Libraries:
+
+telebot: This library is commonly used for creating Telegram bots.
+TelegramClient from telethon.sync: It is used for connecting to the Telegram API and performing various operations.
+InputPeerUser, InputPeerChannel: Types used to represent users and channels.
+sync, events: Modules from telethon for synchronous execution and handling events.
+API Credentials and Token:
+
+api_id: Your Telegram API ID obtained from the Telegram API development tools.
+api_hash: Your Telegram API hash obtained from the Telegram API development tools.
+token: The API token obtained from the BotFather when creating a Telegram bot.
+Phone Number and Session:
+
+phone: Your phone number with the country code.
+client: Creating a TelegramClient instance with the specified session name, API credentials (api_id and api_hash).
+Connecting to Telegram:
+
+client.connect(): Establishing a connection to the Telegram server.
+Authorization:
+
+If the user is not already authorized, the script will send a code request to the specified phone number and prompt the user to enter the received code. This is done through the lines:
+python
+Copy code
+if not client.is_user_authorized():
+    client.send_code_request(phone)
+    client.sign_in(phone, input('Enter the code: '))
+Sending a Message:
+
+The script tries to send a message to a specified user. You need to replace the placeholder values with actual values:
+python
+Copy code
+receiver = InputPeerUser('user_id', 'user_hash')
+client.send_message(receiver, message, parse_mode='html')
+Replace 'user_id' and 'user_hash' with the actual user's ID and hash to whom you want to send the message.
+message variable contains the text of the message.
+parse_mode='html' is used to specify that the message is in HTML format.
+Handling Exceptions:
+
+The script includes a generic exception handler to print any exceptions that might occur during the execution.
+Disconnecting from Telegram:
+
+client.disconnect(): Disconnecting the Telegram session.
+Remember to replace placeholder values with actual values for user_id, user_hash, and any other necessary details. Additionally, you should handle exceptions more gracefully in a production environment.
+
+User
+where can i find user_id and user_hash?
+ChatGPT
+The user_id and user_hash are specific identifiers associated with a Telegram user. You can obtain these values through the Telegram API or by using the Telethon library itself. Here's a step-by-step guide on how to find the user_id and user_hash:
+
+Using Telethon:
+
+a. You can use Telethon to retrieve the user_id and access_hash by running the following code snippet:
+
+python
+Copy code
+from telethon.sync import TelegramClient
+
+api_id = 'Your_API_ID'
+api_hash = 'Your_API_HASH'
+phone_number = 'User_Phone_Number_With_Country_Code'
+
+with TelegramClient('session_name', api_id, api_hash) as client:
+    user = client.get_me()
+    print(f'user_id: {user.id}, access_hash: {user.access_hash}')
+Replace 'Your_API_ID', 'Your_API_HASH', and 'User_Phone_Number_With_Country_Code' with your actual API credentials and the phone number of the user whose ID you want to obtain. The script will print the user_id and access_hash of the authenticated user.
+
+Manually Obtaining User ID:
+
+a. You can ask the user to send a message to your bot.
+
+b. Retrieve the user_id by checking the updates received by your bot. The user_id will be present in the update.message.from_id field.
+
+Note: The user_id is different from the chat_id. The chat_id is easier to obtain and can be used for sending messages, but it may not be suitable for all purposes.
+
+Always ensure that you have the necessary permissions to obtain user information, and respect user privacy and terms of service when working with such data.
+
+If you don't have a 'user_hash', just enter 0.
+
+I.e.:
+
+userid=555555555
+userhash=0
+
+receiver=InputPeerUser(userid, userhash)
+For those requests having a “limit” parameter, you can often set it to zero to signify “return default amount”. This won’t work for all of them though, for instance, in “messages.search” it will actually return 0 items.
+
+Reference: https://telethonn.readthedocs.io/en/latest/extra/advanced-usage/accessing-the-full-api.html
+
+
+
+
+
+

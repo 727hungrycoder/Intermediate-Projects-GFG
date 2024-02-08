@@ -1,0 +1,862 @@
+If you are ever curious to know how we can fetch Gmail e-mails using Python then this article is for you.
+As we know Python is a multi-utility language which can be used to do a wide range of tasks. Fetching Gmail emails though is a tedious task but with Python, many things can be done if you are well versed with its usage. Gmail provides IMAP access to clients who want to access Gmail without manually logging in the browser.
+
+In setting page, enable this before running script. 
+
+Implementation: 
+The libraries used in this implementation includes imaplib, email. You have to manually go and make IMAP access enabled by going into your Gmail account settings. After this only you could access your Gmail account without logging in browser. 
+
+
+Sure, let's go through the code line by line:
+
+python
+Copy code
+# Importing libraries
+import imaplib, email
+Here, the code imports two libraries: imaplib for accessing and manipulating mail using the Internet Message Access Protocol (IMAP), and email for handling email messages.
+
+python
+Copy code
+user = 'USER_EMAIL_ADDRESS'
+password = 'USER_PASSWORD'
+imap_url = 'imap.gmail.com'
+These variables store the user's email address, password, and the IMAP server address for Gmail.
+
+python
+Copy code
+# Function to get email content part i.e its body part
+def get_body(msg):
+    if msg.is_multipart():
+        return get_body(msg.get_payload(0))
+    else:
+        return msg.get_payload(None, True)
+This function, get_body, takes an email message (msg) as input and extracts its body content. It checks if the message is multipart (contains multiple parts), and if so, it recursively calls itself to get the body of the first part. Otherwise, it directly retrieves the payload.
+
+python
+Copy code
+# Function to search for a key value pair 
+def search(key, value, con): 
+    result, data = con.search(None, key, '"{}"'.format(value))
+    return data
+The search function takes three parameters: a search key, a search value, and an IMAP connection (con). It uses the con.search method to search for emails matching the specified key-value pair and returns the search results.
+
+python
+Copy code
+# Function to get the list of emails under this label
+def get_emails(result_bytes):
+    msgs = []  # all the email data are pushed inside an array
+    for num in result_bytes[0].split():
+        typ, data = con.fetch(num, '(RFC822)')
+        msgs.append(data)
+
+    return msgs
+The get_emails function takes the result bytes from a search operation and retrieves the corresponding email messages using the con.fetch method. It returns a list (msgs) containing the fetched email data.
+
+python
+Copy code
+# this is done to make SSL connection with GMAIL
+con = imaplib.IMAP4_SSL(imap_url) 
+Here, an SSL connection to the Gmail IMAP server is established using IMAP4_SSL.
+
+python
+Copy code
+# logging the user in
+con.login(user, password) 
+The code logs into the Gmail account using the provided email address and password.
+
+python
+Copy code
+# calling function to check for email under this label
+con.select('Inbox') 
+The con.select method is used to choose a specific mailbox (in this case, 'Inbox') for further operations.
+
+python
+Copy code
+# fetching emails from this user "tu**h*****1@gmail.com"
+msgs = get_emails(search('FROM', 'MY_ANOTHER_GMAIL_ADDRESS', con))
+This line searches for emails in the 'Inbox' sent from the specified Gmail address ('MY_ANOTHER_GMAIL_ADDRESS') and retrieves the corresponding emails using the get_emails function.
+
+python
+Copy code
+# Uncomment this to see what actually comes as data 
+# print(msgs) 
+This comment suggests uncommenting the line to print the raw email data. It can be useful for debugging and understanding the structure of the fetched emails.
+
+python
+Copy code
+# Finding the required content from our msgs
+# User can make custom changes in this part to
+# fetch the required content he / she needs
+
+# printing them by the order they are displayed in your gmail 
+for msg in msgs[::-1]: 
+    for sent in msg:
+        if type(sent) is tuple: 
+            # encoding set as utf-8
+            content = str(sent[1], 'utf-8') 
+            data = str(content)
+
+            # Handling errors related to unicodenecode
+            try: 
+                indexstart = data.find("ltr")
+                data2 = data[indexstart + 5: len(data)]
+                indexend = data2.find("</div>")
+
+                # printing the required content which we need
+                # to extract from our email i.e our body
+                print(data2[0: indexend])
+
+            except UnicodeEncodeError as e:
+                pass
+This section iterates through the fetched emails (msgs) and processes each email. It extracts the content of the email, handling encoding issues. It searches for the start and end indices of the email body and prints the extracted content. The specific extraction logic may need customization based on the structure of the emails you are working with. Additionally, it reverses the order of emails for printing (msgs[::-1]) to display them in the order they are shown in Gmail.
+
+User
+# Importing libraries
+import imaplib, email
+
+user = 'USER_EMAIL_ADDRESS'
+password = 'USER_PASSWORD'
+imap_url = 'imap.gmail.com'
+
+# Function to get email content part i.e its body part
+def get_body(msg):
+	if msg.is_multipart():
+		return get_body(msg.get_payload(0))
+	else:
+		return msg.get_payload(None, True)
+
+# Function to search for a key value pair 
+def search(key, value, con): 
+	result, data = con.search(None, key, '"{}"'.format(value))
+	return data
+
+# Function to get the list of emails under this label
+def get_emails(result_bytes):
+	msgs = [] # all the email data are pushed inside an array
+	for num in result_bytes[0].split():
+		typ, data = con.fetch(num, '(RFC822)')
+		msgs.append(data)
+
+	return msgs
+
+# this is done to make SSL connection with GMAIL
+con = imaplib.IMAP4_SSL(imap_url) 
+
+# logging the user in
+con.login(user, password) 
+
+# calling function to check for email under this label
+con.select('Inbox') 
+
+# fetching emails from this user "tu**h*****1@gmail.com"
+msgs = get_emails(search('FROM', 'MY_ANOTHER_GMAIL_ADDRESS', con))
+
+# Uncomment this to see what actually comes as data 
+# print(msgs) 
+
+
+# Finding the required content from our msgs
+# User can make custom changes in this part to
+# fetch the required content he / she needs
+
+# printing them by the order they are displayed in your gmail 
+for msg in msgs[::-1]: 
+	for sent in msg:
+		if type(sent) is tuple: 
+
+			# encoding set as utf-8
+			content = str(sent[1], 'utf-8') 
+			data = str(content)
+
+			# Handling errors related to unicodenecode
+			try: 
+				indexstart = data.find("ltr")
+				data2 = data[indexstart + 5: len(data)]
+				indexend = data2.find("</div>")
+
+				# printing the required content which we need
+				# to extract from our email i.e our body
+				print(data2[0: indexend])
+
+			except UnicodeEncodeError as e:
+				pass
+ChatGPT
+This script is designed to fetch and print the body content of emails received in the Gmail inbox from a specified sender email address. Let's go through the code again:
+
+Importing Libraries:
+
+python
+Copy code
+import imaplib, email
+Importing the necessary libraries - imaplib for IMAP communication and email for handling email content.
+
+Setting Credentials and IMAP Server:
+
+python
+Copy code
+user = 'USER_EMAIL_ADDRESS'
+password = 'USER_PASSWORD'
+imap_url = 'imap.gmail.com'
+Setting the Gmail user's email address, password, and the IMAP server address.
+
+get_body Function:
+
+python
+Copy code
+def get_body(msg):
+    if msg.is_multipart():
+        return get_body(msg.get_payload(0))
+    else:
+        return msg.get_payload(None, True)
+This function takes an email message (msg) as input and recursively retrieves its body content. It handles the case where the message is multipart.
+
+search Function:
+
+python
+Copy code
+def search(key, value, con):
+    result, data = con.search(None, key, '"{}"'.format(value))
+    return data
+The search function searches for emails with a specific key-value pair. It takes the search key, search value, and the IMAP connection (con) as parameters.
+
+get_emails Function:
+
+python
+Copy code
+def get_emails(result_bytes):
+    msgs = []
+    for num in result_bytes[0].split():
+        typ, data = con.fetch(num, '(RFC822)')
+        msgs.append(data)
+    return msgs
+The get_emails function fetches the email content for a given set of result bytes from a search operation. It returns a list of email data.
+
+Establishing SSL Connection:
+
+python
+Copy code
+con = imaplib.IMAP4_SSL(imap_url)
+Creating an SSL connection to the Gmail IMAP server.
+
+Logging In:
+
+python
+Copy code
+con.login(user, password)
+Logging into the Gmail account using the provided email address and password.
+
+Selecting Inbox:
+
+python
+Copy code
+con.select('Inbox')
+Choosing the 'Inbox' mailbox for further operations.
+
+Searching for Emails from a Specific Sender:
+
+python
+Copy code
+msgs = get_emails(search('FROM', 'MY_ANOTHER_GMAIL_ADDRESS', con))
+Searching for emails from a specified sender (replace 'MY_ANOTHER_GMAIL_ADDRESS' with the actual sender's email address) and fetching the corresponding email data.
+
+Printing Email Content:
+
+python
+Copy code
+for msg in msgs[::-1]:
+    for sent in msg:
+        if type(sent) is tuple:
+            content = str(sent[1], 'utf-8')
+            data = str(content)
+            try:
+                indexstart = data.find("ltr")
+                data2 = data[indexstart + 5: len(data)]
+                indexend = data2.find("</div>")
+                print(data2[0: indexend])
+            except UnicodeEncodeError as e:
+                pass
+Iterating through the fetched emails and printing the extracted body content. The content is retrieved by searching for specific HTML tags within the email content.
+
+Please note that email parsing and extraction can be complex, and the script's success may depend on the structure of the emails you are working with. Additionally, handling HTML content in emails may require more sophisticated parsing techniques.
+
+User
+def get_body(msg):
+    if msg.is_multipart():
+        return get_body(msg.get_payload(0))
+    else:
+        return msg.get_payload(None, True)
+ChatGPT
+This function, get_body, is a recursive function that retrieves the body content of an email message. Let's break down how it works:
+
+python
+Copy code
+def get_body(msg):
+    if msg.is_multipart():
+        return get_body(msg.get_payload(0))
+    else:
+        return msg.get_payload(None, True)
+The function takes an email message object (msg) as its input.
+
+It checks if the message is multipart using the is_multipart() method. A multipart message can have multiple parts, each potentially containing different content types.
+
+If the message is multipart, it calls itself recursively with the payload of the first part (msg.get_payload(0)). This is because the body content may be nested within the parts of a multipart message.
+
+If the message is not multipart (i.e., it's a single-part message), it retrieves the payload using msg.get_payload(None, True). The None parameter is used to return the entire payload, and True is used to decode the payload if it's encoded.
+
+The function returns the body content of the email.
+
+In summary, this function recursively navigates through the parts of a multipart email message until it finds the part that contains the actual body content. If the email is not multipart, it directly retrieves the body content.
+
+User
+eturn get_body(msg.get_payload(0)) explain in brief
+ChatGPT
+The line return get_body(msg.get_payload(0)) is a recursive call to the get_body function. Let's break down what this line does:
+
+msg.get_payload(0): This retrieves the payload of the email message. In the context of a multipart email, the payload is a list of parts, and msg.get_payload(0) gets the first part of this list (index 0).
+
+get_body(...): The get_body function is then called with the retrieved payload as its argument. This means that the function is now recursively applied to the first part of the email.
+
+The recursive call continues the process of navigating through the parts of a multipart email until it finds the part that contains the actual body content.
+
+In summary, this line is responsible for recursively processing the parts of a multipart email message, ensuring that the function drills down into the structure until it reaches the part that holds the body content.
+
+User
+def get_body(msg):
+    if msg.is_multipart():
+        return get_body(msg.get_payload(0))
+    else:
+        return msg.get_payload(None, True) explain in detail paragraphs
+ChatGPT
+Certainly! Let's break down the get_body function in detail:
+
+The get_body function is designed to retrieve the body content of an email message. It takes an email message (msg) as an argument.
+
+python
+Copy code
+def get_body(msg):
+The function starts with a conditional check to determine if the email message is multipart. A multipart email consists of multiple parts, potentially including text, attachments, and other components.
+
+python
+Copy code
+    if msg.is_multipart():
+If the email is multipart, it means it has multiple parts. In this case, the function makes a recursive call to get_body with the payload of the first part (msg.get_payload(0)). This is done to navigate through the structure of multipart emails and locate the part that contains the actual body content.
+
+python
+Copy code
+        return get_body(msg.get_payload(0))
+The recursive call ensures that the function keeps drilling down into the parts until it finds the one that represents the body content. This is a common approach for handling the complexity of multipart emails.
+
+If the email is not multipart, it means it's a single-part email, and the function directly returns the payload of the message as the body content.
+
+python
+Copy code
+    else:
+        return msg.get_payload(None, True)
+The msg.get_payload(None, True) retrieves the payload of the message. The True argument indicates that the payload should be returned as a string if it's not already. This ensures that the function returns the body content as a string.
+
+In summary, the get_body function recursively navigates through the parts of a multipart email to find the body content. When dealing with a single-part email, it directly retrieves the payload as the body content. This function is useful for extracting the main text content of an email, which is often the primary focus for further processing or analysis.
+
+User
+If the email is multipart, it means it has multiple parts. In this case, the function makes a recursive call to get_body with the payload of the first part (msg.get_payload(0)). This is done to navigate through the structure of multipart emails and locate the part that contains the actual body content. explain by an example using different parts of email
+ChatGPT
+Certainly! Let's consider an example of a multipart email to illustrate how the get_body function works when navigating through different parts of an email.
+
+Suppose we have a multipart email with the following structure:
+
+mathematica
+Copy code
+Multipart Email
+|-- Part 1 (Text)
+|-- Part 2 (Image)
+|-- Part 3 (Attachment)
+Here, the email consists of three parts. Part 1 contains plain text, Part 2 contains an image, and Part 3 is an attachment.
+
+Now, let's apply the get_body function to this example:
+
+python
+Copy code
+def get_body(msg):
+    if msg.is_multipart():
+        return get_body(msg.get_payload(0))
+    else:
+        return msg.get_payload(None, True)
+Initial Call:
+The function is called with the entire multipart email as the argument.
+
+python
+Copy code
+get_body(multipart_email)
+First Check (Is Multipart?):
+The function checks if the email is multipart, which is true in this case.
+
+Recursive Call:
+Since the email is multipart, the function makes a recursive call with the payload of the first part (msg.get_payload(0)).
+
+python
+Copy code
+get_body(part_1)
+Now, the function is focused on Part 1.
+
+Check (Is Multipart?):
+The function checks if Part 1 is multipart. If it is, it makes another recursive call with the payload of the first part of Part 1.
+
+python
+Copy code
+get_body(part_1_text)
+Now, the function is focused on the text part within Part 1.
+
+Final Result:
+Since the text part is not multipart, the function returns the payload of the text part.
+
+python
+Copy code
+return part_1_text.get_payload(None, True)
+The text content of Part 1 is extracted.
+
+In summary, the recursive calls allow the function to navigate through the different parts of the multipart email until it reaches the part that contains the actual body content (in this case, the text part). The recursion effectively handles the hierarchy of multipart emails, ensuring that the correct content is extracted.
+
+User
+if part is image then how will it proceed to part 2
+ChatGPT
+If the part is an image, the get_body function will still follow a similar logic. Let's modify the example to consider a scenario where Part 1 is an image:
+
+python
+Copy code
+def get_body(msg):
+    if msg.is_multipart():
+        return get_body(msg.get_payload(0))
+    else:
+        return msg.get_payload(None, True)
+Assume the updated email structure:
+
+mathematica
+Copy code
+Multipart Email
+|-- Part 1 (Image)
+|-- Part 2 (Text)
+|-- Part 3 (Attachment)
+Initial Call:
+The function is called with the entire multipart email.
+
+python
+Copy code
+get_body(multipart_email)
+First Check (Is Multipart?):
+The function checks if the email is multipart.
+
+If it's True (which it is in this case), the function makes a recursive call with the payload of the first part (msg.get_payload(0)).
+If it's False, the function directly returns the payload.
+Recursive Call:
+Since the email is multipart, the function makes a recursive call with the payload of the first part.
+
+python
+Copy code
+get_body(part_1)
+Check (Is Multipart?):
+The function checks if Part 1 is multipart. If it is:
+
+If the content type of Part 1 is an image, the function may decide to handle it differently (e.g., extracting image information or saving the image). The specific logic for handling image parts would depend on the application's requirements.
+
+If the content type is not an image, the function continues the recursive call.
+
+python
+Copy code
+get_body(part_2)
+Now, the function is focused on Part 2.
+
+The key point is that the get_body function adapts its behavior based on the content type of each part. If a part is an image, you may choose to handle it differently than, for example, plain text. The function's behavior can be extended to accommodate different content types appropriately.
+
+User
+def search(key, value, con): 
+    result, data = con.search(None, key, '"{}"'.format(value))
+    return data
+ 
+ChatGPT
+The search function in your code is designed to search for emails in a specific mailbox that match a given key-value pair. Let's break down its functionality:
+
+python
+Copy code
+def search(key, value, con): 
+    result, data = con.search(None, key, '"{}"'.format(value))
+    return data
+Here's an explanation of each part of the function:
+
+Function Definition:
+
+def search(key, value, con): declares a function named search that takes three parameters: key, value, and con.
+IMAP Search Operation:
+
+con.search(None, key, '"{}"'.format(value)) performs a search operation using the IMAP (Internet Message Access Protocol) protocol to find emails based on the specified criteria.
+con is an IMAP4 object representing the connection to the email server.
+None in the first argument indicates that the search will be performed in the currently selected mailbox.
+key is the search criterion, such as 'FROM', 'SUBJECT', etc.
+'"{}"'.format(value) formats the search value inside double quotes, ensuring that the value is correctly enclosed for the search operation.
+Result and Data:
+
+result, data = con.search(None, key, '"{}"'.format(value)) captures the result of the search operation.
+result typically contains the result status (OK, NO, BAD), and data contains the matching email message numbers.
+Return Statement:
+
+return data returns the data (matching email message numbers) from the function.
+Example Usage:
+
+python
+Copy code
+# Assume 'con' is an IMAP4 object representing the connection
+# Search for emails from a specific sender (replace 'sender@example.com' with the actual email address)
+search_result = search('FROM', 'sender@example.com', con)
+
+# 'search_result' may contain the list of matching email message numbers
+print(search_result)
+This function allows you to perform searches based on different criteria like sender, subject, date, etc., and retrieve the corresponding email message numbers.
+
+User
+for msg in msgs[::-1]: 
+    for sent in msg:
+        if type(sent) is tuple: 
+ 
+            # encoding set as utf-8
+            content = str(sent[1], 'utf-8') 
+            data = str(content)
+ 
+            # Handling errors related to unicodenecode
+            try: 
+                indexstart = data.find("ltr")
+                data2 = data[indexstart + 5: len(data)]
+                indexend = data2.find("</div>")
+ 
+                # printing the required content which we need
+                # to extract from our email i.e our body
+                print(data2[0: indexend])
+ 
+            except UnicodeEncodeError as e:
+                pass
+ChatGPT
+This part of the code processes the email messages obtained from the IMAP server. Let's break down the functionality step by step:
+
+python
+Copy code
+for msg in msgs[::-1]:  # Loop through the list of email messages in reverse order
+    for sent in msg:  # Loop through the parts of each email message
+        if type(sent) is tuple:  # Check if the part is a tuple (contains email data)
+
+            # Decode the email content using UTF-8 encoding
+            content = str(sent[1], 'utf-8')
+            data = str(content)
+
+            # Handling errors related to Unicode encoding
+            try: 
+                # Find the starting index of the content inside the HTML body
+                indexstart = data.find("ltr")
+                data2 = data[indexstart + 5: len(data)]
+                
+                # Find the ending index of the content inside the HTML body
+                indexend = data2.find("</div>")
+
+                # Print the required content extracted from the email body
+                print(data2[0: indexend])
+
+            except UnicodeEncodeError as e:
+                # Handle Unicode encoding errors, if any
+                pass
+Here's an explanation of each part:
+
+Outer Loop (for msg in msgs[::-1]:):
+
+This loop iterates through the list of email messages (msgs) in reverse order ([::-1]), meaning it starts from the most recent message.
+Inner Loop (for sent in msg:):
+
+This loop iterates through the different parts of each email message.
+Check for Tuple (if type(sent) is tuple:):
+
+It checks if the current part is a tuple. The tuple contains email data, and this condition filters out non-tuple parts.
+Decode Email Content:
+
+content = str(sent[1], 'utf-8'): Decodes the content of the email using UTF-8 encoding.
+data = str(content): Creates a string representation of the decoded content.
+Try-Except Block (try: and except UnicodeEncodeError as e:):
+
+It handles potential Unicode encoding errors that might occur during string operations.
+Content Extraction (indexstart, data2, indexend):
+
+indexstart = data.find("ltr"): Finds the starting index of the content inside the HTML body.
+data2 = data[indexstart + 5: len(data)]: Extracts the content from the starting index + 5 to the end.
+indexend = data2.find("</div>"): Finds the ending index of the content.
+Print Extracted Content (print(data2[0: indexend])):
+
+Prints the extracted content from the email body, starting from index 0 to the calculated ending index.
+UnicodeEncodeError Handling (except UnicodeEncodeError as e:):
+
+If there is a Unicode encoding error, it is caught and ignored (pass), allowing the program to continue processing other parts of the email.
+This code is designed to extract and print specific content from the HTML body of each email message.
+
+User
+# Importing libraries
+import imaplib, email
+
+user = 'USER_EMAIL_ADDRESS'
+password = 'USER_PASSWORD'
+imap_url = 'imap.gmail.com'
+
+# Function to get email content part i.e its body part
+def get_body(msg):
+	if msg.is_multipart():
+		return get_body(msg.get_payload(0))
+	else:
+		return msg.get_payload(None, True)
+
+# Function to search for a key value pair 
+def search(key, value, con): 
+	result, data = con.search(None, key, '"{}"'.format(value))
+	return data
+
+# Function to get the list of emails under this label
+def get_emails(result_bytes):
+	msgs = [] # all the email data are pushed inside an array
+	for num in result_bytes[0].split():
+		typ, data = con.fetch(num, '(RFC822)')
+		msgs.append(data)
+
+	return msgs
+
+# this is done to make SSL connection with GMAIL
+con = imaplib.IMAP4_SSL(imap_url) 
+
+# logging the user in
+con.login(user, password) 
+
+# calling function to check for email under this label
+con.select('Inbox') 
+
+# fetching emails from this user "tu**h*****1@gmail.com"
+msgs = get_emails(search('FROM', 'MY_ANOTHER_GMAIL_ADDRESS', con))
+
+# Uncomment this to see what actually comes as data 
+# print(msgs) 
+
+
+# Finding the required content from our msgs
+# User can make custom changes in this part to
+# fetch the required content he / she needs
+
+# printing them by the order they are displayed in your gmail 
+for msg in msgs[::-1]: 
+	for sent in msg:
+		if type(sent) is tuple: 
+
+			# encoding set as utf-8
+			content = str(sent[1], 'utf-8') 
+			data = str(content)
+
+			# Handling errors related to unicodenecode
+			try: 
+				indexstart = data.find("ltr")
+				data2 = data[indexstart + 5: len(data)]
+				indexend = data2.find("</div>")
+
+				# printing the required content which we need
+				# to extract from our email i.e our body
+				print(data2[0: indexend])
+
+			except UnicodeEncodeError as e:
+				pass
+where is get body function is used?
+ChatGPT
+In the provided code, the get_body function is not explicitly called within the main part of the script. However, the get_body function is designed to be a helper function that could be utilized when processing the content of the email messages.
+
+The purpose of the get_body function is to extract the body part of an email message. It's a recursive function that navigates through the different parts of a multipart email to find the actual content. In this script, it may not be explicitly called, but its logic could be incorporated into a more extensive email processing pipeline if needed.
+
+For example, you might use the get_body function to extract the body content of an email message before further processing or analyzing that content. In this specific script, the focus is on printing the content that matches certain criteria, and the get_body function might not be necessary for this particular use case.
+
+
+2 / 2
+
+User
+take this eHow to get a coding job even in this economy [Free 4-hour course]
+Inbox
+
+Quincy Larson <quincy@freecodecamp.org>
+15:19 (8 hours ago)
+to me
+
+Here are this week's five freeCodeCamp resources that are worth your time:
+
+1. Many people who are learning to code have the goal of eventually working as a developer. But landing that first developer role is not an easy task. Luckily, my friend Lane Wagner created this course to help guide you through the process. It's jam-packed with tips from me and a lot of other developers. (4 hour YouTube course): https://www.freecodecamp.org/news/how-to-get-a-developer-job
+
+2. For years, people have asked for an in-depth course on Data Engineering. And I'm thrilled to say freeCodeCamp just published one, and it's a banger. Data Engineers design systems to collect, store, and analyze data – systems that Data Scientists and Data Analysts rely on. This course will teach you key concepts like Data Pipelines and ETL (Extract-Transform-Load). And you'll learn how to use tools like Docker, CRON, and Apache Airflow. (3 hour YouTube course): https://www.freecodecamp.org/news/learn-the-essentials-of-data-engineering/
+
+3. freeCodeCamp also just published a full-length book on Advanced Object-Oriented Programming (OOP) in Java. It will teach you Java Design Patterns, File Handling, I/O, Concurrent Data Structures, and more. And freeCodeCamp published a more beginner-friendly Java OOP book by the same author a while back, too. (full-length book): https://www.freecodecamp.org/news/object-oriented-programming-in-java/
+
+4. freeCodeCamp uses the open source NGINX web server, and more than one third of all other websites do, too. NGINX uses an asynchronous, event-driven architecture so you can handle a ton of concurrent users with fewer servers. We just published a crash course on using NGINX for back-end development. You'll learn how to use it for load balancing, reverse proxying, data streaming, and even as a Microservice Architecture. (1 hour YouTube course): https://www.freecodecamp.org/news/nginx/
+
+5. You may have heard the term “ACID database”. It refers to a database that guarantees transactions with Atomicity, Consistency, Isolation, and Durability. MySQL and PostgreSQL are fully ACID-compliant. Other databases like MongoDB and Cassandra have partial ACID guarantees. So what are these properties and why are they so important? This article by Daniel Adetunji will explain everything using helpful analogies and some of his own artwork. (20 minute read): https://www.freecodecamp.org/news/acid-databases-explained/
+
+Just a reminder that freeCodeCamp is a 501(c)(3) public charity. We don't have any stock holders or investors. Even though I founded freeCodeCamp, I donated all my shares to the charity. So no one owns any equity in freeCodeCamp. Instead, we're owned by the freeCodeCamp community itself. And each month, 8,408 of those kind folks donate to support our mission. If you're able to, you should, too: https://www.freecodecamp.org/donate
+
+Quote of the Week: “Data engineers are the plumbers building a data pipeline, while data scientists are the painters and storytellers, giving the data a voice.” — Steven Levy, author of many excellent books about developers and tech companies
+
+Until next week, happy coding.
+
+-- Quincy Larson
+
+Teacher and founder of freeCodeCamp.org
+
+
+xample  and explain get body
+ChatGPT
+Certainly! Let's use the provided email example and see how the get_body function would be applied to extract the body content.
+
+Here's the modified script:
+
+python
+Copy code
+# Importing libraries
+import imaplib, email
+
+user = 'USER_EMAIL_ADDRESS'
+password = 'USER_PASSWORD'
+imap_url = 'imap.gmail.com'
+
+# Function to get email content part i.e its body part
+def get_body(msg):
+    if msg.is_multipart():
+        return get_body(msg.get_payload(0))
+    else:
+        return msg.get_payload(None, True)
+
+# Function to search for a key value pair 
+def search(key, value, con): 
+    result, data = con.search(None, key, '"{}"'.format(value))
+    return data
+
+# Function to get the list of emails under this label
+def get_emails(result_bytes):
+    msgs = []  # all the email data are pushed inside an array
+    for num in result_bytes[0].split():
+        typ, data = con.fetch(num, '(RFC822)')
+        msgs.append(data)
+
+    return msgs
+
+# this is done to make SSL connection with GMAIL
+con = imaplib.IMAP4_SSL(imap_url) 
+
+# logging the user in
+con.login(user, password) 
+
+# calling function to check for email under this label
+con.select('Inbox') 
+
+# fetching emails from this user
+msgs = get_emails(search('FROM', 'quincy@freecodecamp.org', con))
+
+# Finding the required content from our msgs
+# printing them by the order they are displayed in your gmail 
+for msg in msgs[::-1]: 
+    for sent in msg:
+        if type(sent) is tuple: 
+            # encoding set as utf-8
+            content = str(sent[1], 'utf-8') 
+            data = str(content)
+
+            # Handling errors related to unicodenecode
+            try: 
+                indexstart = data.find("ltr")
+                data2 = data[indexstart + 5: len(data)]
+                indexend = data2.find("</div>")
+
+                # extracting the body content using the get_body function
+                body_content = get_body(email.message_from_string(data))
+                print("Email Body Content:\n", body_content)
+
+            except UnicodeEncodeError as e:
+                pass
+In this modified script, the get_body function is applied to the email content using email.message_from_string(data). It extracts the body content, and the result is printed for each email in the inbox. Note that this is a simplified example, and in a real-world scenario, you might want to perform additional processing based on the structure of the email and the desired information.
+
+
+
+
+
+Certainly! Let's use the provided email example and see how the get_body function would be applied to extract the body content.
+
+Here's the modified script:
+
+python
+Copy code
+# Importing libraries
+import imaplib, email
+
+user = 'USER_EMAIL_ADDRESS'
+password = 'USER_PASSWORD'
+imap_url = 'imap.gmail.com'
+
+# Function to get email content part i.e its body part
+def get_body(msg):
+    if msg.is_multipart():
+        return get_body(msg.get_payload(0))
+    else:
+        return msg.get_payload(None, True)
+
+# Function to search for a key value pair 
+def search(key, value, con): 
+    result, data = con.search(None, key, '"{}"'.format(value))
+    return data
+
+# Function to get the list of emails under this label
+def get_emails(result_bytes):
+    msgs = []  # all the email data are pushed inside an array
+    for num in result_bytes[0].split():
+        typ, data = con.fetch(num, '(RFC822)')
+        msgs.append(data)
+
+    return msgs
+
+# this is done to make SSL connection with GMAIL
+con = imaplib.IMAP4_SSL(imap_url) 
+
+# logging the user in
+con.login(user, password) 
+
+# calling function to check for email under this label
+con.select('Inbox') 
+
+# fetching emails from this user
+msgs = get_emails(search('FROM', 'quincy@freecodecamp.org', con))
+
+# Finding the required content from our msgs
+# printing them by the order they are displayed in your gmail 
+for msg in msgs[::-1]: 
+    for sent in msg:
+        if type(sent) is tuple: 
+            # encoding set as utf-8
+            content = str(sent[1], 'utf-8') 
+            data = str(content)
+
+            # Handling errors related to unicodenecode
+            try: 
+                indexstart = data.find("ltr")
+                data2 = data[indexstart + 5: len(data)]
+                indexend = data2.find("</div>")
+
+                # extracting the body content using the get_body function
+                body_content = get_body(email.message_from_string(data))
+                print("Email Body Content:\n", body_content)
+
+            except UnicodeEncodeError as e:
+                pass
+In this modified script, the get_body function is applied to the email content using email.message_from_string(data). It extracts the body content, and the result is printed for each email in the inbox. Note that this is a simplified example, and in a real-world scenario, you might want to perform additional processing based on the structure of the email and the desired information.
+UTF-8 (Unicode Transformation Format, 8-bit) is a character encoding standard that represents characters in most of the world's written languages. It is a variable-width encoding, which means that it can represent each character using one, two, three, or more bytes depending on the character's Unicode code point.
+
+Here are some key features of UTF-8:
+
+Compatibility: UTF-8 is designed to be compatible with ASCII, which means that the first 128 characters (ASCII characters) have the same representation in UTF-8 as they do in ASCII.
+
+Variable-Length Encoding: UTF-8 uses a variable number of bytes to represent characters. Basic Latin characters (like letters and digits) are represented using one byte, while characters from other scripts or special characters may be represented using two or more bytes.
+
+Efficiency: It is space-efficient for English and other Western languages since it represents common characters using a single byte.
+
+Universal Character Set: UTF-8 can represent any character in the Unicode standard, which includes a vast range of characters from various writing systems, symbols, and special characters.
+
+Self-Synchronization: One of the important properties of UTF-8 is that it's self-synchronizing. This means that if you start reading a byte stream from any point, you can immediately tell whether you are in the middle of a character or at the start of a new one.
+
+UTF-8 has become the dominant character encoding for the web and is widely used in various applications and systems. It provides a standardized way to represent text in a way that is compatible with different languages and scripts.

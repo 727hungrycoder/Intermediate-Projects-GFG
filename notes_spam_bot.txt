@@ -1,0 +1,27 @@
+
+PyAutoGUI is a Python module that helps us automate the key presses and mouse clicks programmatically. In this article we will learn to develop a spam bot using PyAutoGUI.
+
+Spamming – Refers to sending unsolicited messages to large number of systems over the internet. 
+
+This mini-project can be used for many real-life applications like:
+
+Remind your friends or relatives to do a particular task after every particular time interval
+Can be used for advertisement purpose
+
+
+
+Approach
+
+Import module
+Add delay of 2 second in the execution of the program
+Create mechanism to generate text messages. typewrite() function of pyautogui helps to write the text and sleep function helps us specify the particular time interval (in seconds) after which the next instruction has to be executed. datetime.datetime.now() function helps the user keep a track of when the message was sent.
+Syntax:
+
+typewriter(“<message>”)
+
+Execute code
+Follow these simple steps to develop a spam bot using python:
+
+Example:
+
+

@@ -1,0 +1,102 @@
+from instapy import InstaPy 
+
+session = InstaPy(username="your username",password="your password") 
+session.login()
+is session an object here
+ChatGPT
+Yes, in the provided code snippet, session is an instance of the InstaPy class. The InstaPy class is part of the InstaPy library, which is a Python wrapper for interacting with Instagram through automation.
+
+Here's a breakdown of the code:
+
+Importing the InstaPy Class:
+
+python
+Copy code
+from instapy import InstaPy
+This line imports the InstaPy class from the instapy module.
+
+Creating an Instance (Object) of InstaPy:
+
+python
+Copy code
+session = InstaPy(username="your username", password="your password")
+This line creates an instance of the InstaPy class named session. The username and password parameters are used to initialize the instance with the credentials of the Instagram account you want to automate.
+
+Logging in:
+
+python
+Copy code
+session.login()
+This line calls the login method on the session object, attempting to log in to the specified Instagram account using the provided credentials.
+
+So, session is an object of the InstaPy class, and you can perform various actions and interactions with Instagram using methods provided by the InstaPy class on this object.
+
+
+InstaPy does some other things, such as checking your internet connection and the status of the Instagram servers. We can observe this directly on the browser or in the logs:
+
+It can take some time to load as you can see below
+
+
+
+Like by tags
+
+First, we can like some posts that are tagged #dance or #mercedes using like_by_tags():
+
+session.like_by_tags(["dance", "mercedes"], amount=10, interact=True)
+Here, we gave the method a list of tags to like and the number of posts to like for each given tag. Here, we instructed it to like ten posts each. InstaPy logs every action it takes.  
+
+It mentions which post it liked and its link, description, location, and whether the bot commented on the post or followed the author.
+
+Don’t like
+
+
+We can use set_dont_like(): to prevent the bot to like inappropriate posts.
+
+session.set_dont_like(["naked", "murder", "nsfw"])
+Before running the code, we have to change a bit of code in the xpath_compile.py file present in ‘site-packages/instapy/xpath_compile.py because Instagram has modified the HTML  
+
+Remove:
+
+xpath[“like_image”] = {
+
+   “like”: “//section/span/button[*[local-name () =’svg’]/@aria-label=’Like’]”,
+
+   “unlike”: “//section/span/button[*[local-name () =’svg’]/@aria-label=’Unlike’]”,
+
+}
+
+Replace with:
+
+xpath[“like_image”] = {
+
+   “like”: “//section/span/button/div[*[local-name()=’svg’]/@aria-label=’Like’]”,
+
+   “unlike”: “//section/span/button/div[*[local-name()=’svg’]/@aria-label=’Unlike’]”,
+
+}
+
+If we do not replace the above code, it throws the error of instapy: “Invalid Like Element!”
+
+Set comments
+
+Next, you can also leave some comments on the posts. First, enable commenting with set_do_comment(). Second, tell the bot what comments to leave with set_comments().
+
+session.set_do_comment(True, percentage=100) 
+session.set_comments(["Nice", "Amazing", "Super"])
+Set follow
+
+Next, you can tell the bot to not only like the posts but also to follow some authors of those posts. You can do that with set_do_follow ().
+
+session.set_do_follow(enabled=True, percentage=100)
+Set interaction
+
+After this, you have to use set_user_interact () to reflect the actual user experience after one interaction with the user interface. Here amount is the number of posts the bot will interact in a single profile.
+
+session.set_user_interact(amount=1, randomize=True, percentage=100)
+IMPORTANT: You must set configuration BEFORE call activity and also set interaction, which means after the above session settings keep the activities otherwise the bot will only like the posts but it won’t comment or follow.
+
+End
+
+Now that you’re done with the basic settings, it’s a good idea to end the session with the end().
+
+session.end()

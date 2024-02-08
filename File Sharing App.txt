@@ -1,0 +1,205 @@
+aComputer Networks is an important topic and to understand the concepts, practical application of the concepts is needed. In this particular article, we will see how to make a simple file-sharing app using Python.  An HTTP Web Server is software that understands URLs (web address) and HTTP (the protocol used to view webpages). Python has several packages which is a collection of modules. And it has several built-in servers. The modules used in this project are:
+
+The HTTPServer is a socketserver, which creates and listens at the HTTP socket.
+The socketserver modules simplify the task of writing network servers.
+The webbrowser module provides us with a high-level interface to allow and display Web-based documents, simply calling the open() function.
+The pyqrcode module is used to generate QR Code in just two lines of code.
+OS module helps for interacting with the operating system. Used for opening files, manipulate paths, and read all lines in all the files on the command line.
+PyPNG allows PNG image files to be read and written using pure Python
+
+
+This script is a simple Python program that sets up an HTTP server, generates a QR code for the server's IP address, and serves the files from the desktop directory. Let's go through the script step by step:
+
+python
+Copy code
+# import necessary modules
+
+# for implementing the HTTP Web servers
+import http.server
+
+# provides access to the BSD socket interface
+import socket
+
+# a framework for network servers
+import socketserver
+
+# to display a Web-based documents to users
+import webbrowser
+
+# to generate qrcode
+import pyqrcode
+from pyqrcode import QRCode
+
+# convert into png format
+import png
+
+# to access operating system control
+import os
+Imports necessary modules for implementing an HTTP server (http.server), working with sockets (socket), serving files (socketserver), displaying web-based documents (webbrowser), generating QR codes (pyqrcode), and accessing the operating system (os).
+python
+Copy code
+# assigning the appropriate port value
+PORT = 8010
+# this finds the name of the computer user
+os.environ['USERPROFILE']
+Sets the port number to 8010 and retrieves the user's profile directory using os.environ['USERPROFILE'].
+python
+Copy code
+# changing the directory to access the files desktop
+# with the help of os module
+desktop = os.path.join(os.path.join(os.environ['USERPROFILE']),
+                    'OneDrive')
+os.chdir(desktop)
+Changes the current working directory to the desktop.
+python
+Copy code
+# creating a http request
+Handler = http.server.SimpleHTTPRequestHandler
+# returns, host name of the system under
+# which Python interpreter is executed
+hostname = socket.gethostname()
+Defines an HTTP request handler (Handler) and retrieves the host name of the system.
+python
+Copy code
+# finding the IP address of the PC
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(("8.8.8.8", 80))
+IP = "http://" + s.getsockname()[0] + ":" + str(PORT)
+link = IP
+Creates a UDP socket, connects to Google's DNS server to find the local IP address, and constructs the full IP address including the specified port.
+python
+Copy code
+# converting the IP address into the form of a QR code
+# with the help of pyqrcode module
+
+# converts the IP address into a Qrcode
+url = pyqrcode.create(link)
+# saves the Qrcode inform of svg
+url.svg("myqr.svg", scale=8)
+# opens the Qrcode image in the web browser
+webbrowser.open('myqr.svg')
+Generates a QR code using the pyqrcode module, saves it as an SVG image, and opens the SVG image in the default web browser.
+python
+Copy code
+# Creating the HTTP request and serving the
+# folder in the PORT 8010, and the pyqrcode is generated
+
+# continuous stream of data between client and server
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print("serving at port", PORT)
+    print("Type this in your Browser", IP)
+    print("or Use the QRCode")
+    httpd.serve_forever()
+Creates an HTTP server using socketserver.TCPServer on the specified port (8010) with the previously defined handler (Handler). Prints messages and starts serving the content of the current working directory indefinitely.
+python
+Copy code
+os.environ['USERPROFILE']
+Retrieves the user's profile directory.
+python
+Copy code
+# changing the directory to access the files on the desktop
+# with the help of os module
+desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'OneDrive')
+os.chdir(desktop)
+Changes the current working directory to the desktop directory.
+When you run this script, it will set up a basic HTTP server, generate a QR code for accessing the server's IP address, and open the QR code in the default web browser. Users can then access the server by entering the IP address in a web browser or scanning the QR code. The server serves files from the desktop directory.
+
+User
+what will be user profile here?
+ChatGPT
+In the context of this script, the term "user profile" is used to refer to the user's home directory on their computer. The os.environ['USERPROFILE'] line is a way to retrieve the path to the user's home directory in a Windows environment.
+
+On Windows systems, the home directory is often referred to as the "user profile." It is the main folder associated with a specific user account and contains user-specific data, documents, settings, and other personalized information.
+
+Let's break down the relevant lines of code:
+
+python
+Copy code
+# this finds the name of the computer user
+os.environ['USERPROFILE']
+This line doesn't store or use the user profile directly in this script; rather, it retrieves the path to the user's profile directory using the os.environ['USERPROFILE'] environment variable. The os.chdir(desktop) line then changes the current working directory to the desktop within the user's profile directory.
+
+In a Windows environment, the os.environ['USERPROFILE'] typically points to a path like C:\Users\Username, where "Username" is the name of the current user. The script then navigates to the desktop within this user profile directory to perform operations such as serving files or generating the QR code.
+
+So, the "user profile" here refers to the main directory associated with the current user's account on a Windows system.
+
+User
+what is this qr code used for
+ChatGPT
+The QR code generated in the provided script is used to conveniently access the HTTP server that the script sets up on the local machine. Here's how the process works:
+
+Setting Up an HTTP Server:
+
+The script creates a simple HTTP server using Python's http.server module.
+The server listens on a specified port (8010) and serves files from the current working directory (in this case, the user's desktop).
+Finding the Local IP Address:
+
+The script determines the local IP address of the machine by briefly connecting to a well-known server (Google's DNS server in this case).
+The local IP address is constructed with the specified port to form a complete URL (e.g., http://192.168.1.2:8010).
+Generating a QR Code:
+
+The script uses the pyqrcode library to generate a QR code representing the constructed URL.
+The QR code is saved as an SVG image file named "myqr.svg" on the user's desktop.
+Opening the QR Code in a Web Browser:
+
+The script opens the generated QR code image in the default web browser.
+Accessing the Server:
+
+Users can scan the QR code with a QR code scanner on their mobile device or manually type the constructed URL into a web browser.
+The web browser then accesses the HTTP server running on the local machine.
+Viewing Served Files:
+
+The HTTP server serves files from the desktop directory, allowing users to navigate and view the files using a web browser.
+In summary, the QR code serves as a quick and convenient way for users to access the locally hosted HTTP server on their machine. It provides a visual representation of the server's URL, making it easy to access the served files without manually typing the address into a web browser. This can be useful, for example, for sharing files or web content within a local network.
+
+User
+Share the files with ease by scanning the QR-code that’s generated and get access to the files in PC, from the mobile browser. how
+ChatGPT
+To share files from a PC to a mobile device using the QR code generated by the provided script, you can follow these steps:
+
+Run the Python Script:
+
+Run the Python script on your PC. This will set up an HTTP server and generate a QR code containing the local IP address and port.
+Access the QR Code:
+
+Open the QR code image (myqr.svg) generated on your desktop. The script automatically opens it in the default web browser. If not, locate the file on your desktop and open it with any image viewer that supports QR code scanning.
+Scan QR Code with Mobile Device:
+
+Use a QR code scanner app on your mobile device to scan the QR code displayed on your PC. Many smartphones have built-in QR code scanners in their camera apps.
+Access Files from Mobile Browser:
+
+After scanning the QR code, your mobile device will recognize the URL encoded in the QR code.
+Open the browser on your mobile device and enter the URL provided by the QR code (e.g., http://192.168.1.2:8010).
+You should see the file listing served by the HTTP server on your PC.
+Navigate and Download Files:
+
+Use your mobile browser to navigate through the file listing.
+Click on files to view or download them directly to your mobile device.
+By following these steps, you create a quick and convenient way to share files from your PC to a mobile device using the generated QR code. This can be useful for accessing documents, images, or other files from your PC on your mobile device without the need for additional cables or file transfers.
+
+
+
+If the QR code is not opening anything on your mobile device, there are a few things you can check and troubleshoot:
+
+Ensure Both Devices Are on the Same Network:
+
+Make sure that both your PC and your mobile device are connected to the same local network.
+Check Firewall Settings:
+
+Ensure that your firewall is not blocking the connection. If you have a firewall enabled on your PC, it might be preventing the mobile device from accessing the server.
+Verify IP Address and Port:
+
+Double-check the IP address and port in the QR code. It should be in the format http://<your_local_ip>:8010. You can find your local IP address using the ipconfig command in the command prompt on your PC.
+Try Opening in a Different Browser:
+
+If you're using a specific browser on your mobile device, try opening the URL in a different mobile browser to see if the issue persists.
+Check for Errors on the PC:
+
+Look at the console where the Python script is running on your PC. It should print messages like "serving at port" and "Type this in your Browser" along with the IP address. Check if there are any error messages.
+Test with a Known URL:
+
+Manually enter the URL (constructed using your local IP address and port) into the browser on your mobile device to see if it can connect to the server.
+Restart the Script:
+
+If there were any changes to the network or firewall settings, try restarting the Python script on your PC and then scan the QR code again with your mobile device.
+If, after checking these points, the issue persists, there may be a more specific problem that requires further investigation. Feel free to share any error messages or additional details, and I'll do my best to assist you.
